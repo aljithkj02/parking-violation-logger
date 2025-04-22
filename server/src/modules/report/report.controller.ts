@@ -1,14 +1,23 @@
-import { Body, Controller, Delete, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
 import { Request } from 'express';
 import { CreateReportDto } from './dto/create-report.dto';
 import { RequestUser } from 'src/common/type';
+import { QueryDto } from './dto/query.dto';
 
 @Controller('report')
 @UseGuards(JwtAuthGuard)
 export class ReportController {
     constructor(private readonly reportService: ReportService) { }
+
+    @Get()
+    getReports(
+        @Req() req: Request,
+        @Query() queryDto: QueryDto
+    ) {
+        return this.reportService.getReports(req.user as RequestUser, queryDto);
+    }
 
     @Post()
     createReport(

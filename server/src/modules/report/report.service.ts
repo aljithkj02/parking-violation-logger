@@ -6,12 +6,49 @@ import { Model } from 'mongoose';
 import { Report } from 'src/schema/report.schema';
 import { isValidObjectId } from 'mongoose';
 import { ReportStatus } from 'src/common/enums';
+import { QueryDto } from './dto/query.dto';
 
 @Injectable()
 export class ReportService {
     constructor(
         @InjectModel(Report.name) private reportModel: Model<Report>
     ) { }
+
+    async getReports(user: RequestUser, { page, limit, filter }: QueryDto) {
+        try {
+            const skip = (page - 1) * limit;
+
+            const [total, reports] = await Promise.all([
+                this.reportModel.countDocuments({ 
+                    reportedUserId: user.id,
+                    ...(filter && { status: filter })
+                }),
+                this.reportModel
+                    .find({ 
+                        reportedUserId: user.id ,
+                        ...(filter && { status: filter })
+                    })
+                    .skip(skip)
+                    .limit(limit)
+                    .sort({ createdAt: -1 })
+            ]);
+
+            const totalPages = Math.ceil(total / limit);
+
+            return {
+                status: true,
+                data: reports,
+                pagination: {
+                    total,
+                    currentPage: page,
+                    totalPages,
+                }
+            };
+        } catch (error) {
+            console.error('Error fetching reports:', error);
+            throw new BadRequestException(error?.message || 'Failed to fetch reports');
+        }
+    }
 
     async createReport(reportDto: CreateReportDto, user: RequestUser) {
         try {
@@ -83,7 +120,6 @@ export class ReportService {
             throw new BadRequestException(error?.message || 'Failed to update report');
         }
     }
-
 
     async deleteReport(reportId: string, user: RequestUser) {
         try {
