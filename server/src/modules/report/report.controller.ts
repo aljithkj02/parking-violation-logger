@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
 import { Request } from 'express';
@@ -25,5 +25,13 @@ export class ReportController {
         @Body() updateReportDto: CreateReportDto
     ) {
         return this.reportService.updateReport(reportId, updateReportDto, req.user as RequestUser);
+    }
+
+    @Delete(':id')
+    deleteReport(
+        @Req() req: Request,
+        @Param("id") reportId: string,
+    ) {
+        return this.reportService.deleteReport(reportId, req.user as RequestUser);
     }
 }

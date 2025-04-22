@@ -84,4 +84,42 @@ export class ReportService {
         }
     }
 
+
+    async deleteReport(reportId: string, user: RequestUser) {
+        try {
+            if (!isValidObjectId(reportId)) {
+                throw new BadRequestException('Invalid report ID');
+            }
+
+            if (!user?.id) {
+                throw new BadRequestException('User ID is missing');
+            }
+
+            const existingReport = await this.reportModel.findById(reportId);
+
+            if (!existingReport) {
+                throw new NotFoundException('Report not found');
+            }
+
+            if (existingReport.reportedUserId.toString() !== user.id) {
+                throw new ForbiddenException('You are not authorized to update this report');
+            }
+
+            if (existingReport.status === ReportStatus.ACTION_TAKEN) {
+                throw new BadRequestException("Already taken action for this report!");
+            }
+
+
+            await this.reportModel.deleteOne({ _id: reportId });
+
+            return {
+                status: true,
+                message: 'Report deleted successfully',
+            };
+        } catch (error) {
+            console.error('Error deleting report:', error);
+            throw new BadRequestException(error?.message || 'Failed to delete report');
+        }
+    }
+
 }
