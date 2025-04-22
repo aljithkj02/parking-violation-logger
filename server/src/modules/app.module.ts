@@ -3,6 +3,10 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schema/user.schema';
 import { Report, ReportSchema } from 'src/schema/report.schema';
+import { ReportModule } from './report/report.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './auth/jwt.strategy';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
     imports: [
@@ -11,9 +15,11 @@ import { Report, ReportSchema } from 'src/schema/report.schema';
             { name: User.name, schema: UserSchema },
             { name: Report.name, schema: ReportSchema },
         ]),
-        AuthModule
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        AuthModule,
+        ReportModule,
     ],
     controllers: [],
-    providers: [],
+    providers: [JwtStrategy, JwtService],
 })
 export class AppModule { }
