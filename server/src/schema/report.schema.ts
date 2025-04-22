@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ReportStatus } from 'generated/prisma';
 import { Document, Types } from 'mongoose';
+import { ReportStatus } from 'src/common/enums';
 
 @Schema({ timestamps: true })
 export class Report extends Document {

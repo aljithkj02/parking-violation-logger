@@ -1,10 +1,11 @@
-import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, } from 'src/schema/user.schema';
 import { Model } from 'mongoose';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +54,46 @@ export class AuthService {
         } catch (error) {
             console.error('Signup error:', error);
             throw new InternalServerErrorException('Failed to create user');
+        }
+    }
+
+
+    async login(loginDto: LoginDto) {
+        const { email, password } = loginDto;
+
+        try {
+            // Check if user exists
+            const user = await this.userModel.findOne({ email });
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+
+            // Compare passwords
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                throw new UnauthorizedException('Invalid credentials');
+            }
+
+            // Sign JWT token with user ID
+            const token = await this.jwtService.signAsync({ id: user._id });
+
+            // Return token and user info (excluding password)
+            return {
+                message: 'Login successful',
+                token,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                },
+            };
+        } catch (error) {
+            console.error('Login error:', error);
+            if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Login failed');
         }
     }
 }
