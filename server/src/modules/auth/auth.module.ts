@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
             secret: process.env.JWT_SECRET,
             signOptions: { expiresIn: '7d' },
         }),
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ],
     controllers: [AuthController],
     providers: [AuthService],

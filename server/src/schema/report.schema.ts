@@ -16,7 +16,7 @@ export class Report extends Document {
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     reportedUserId: Types.ObjectId;
 
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    @Prop({ type: Types.ObjectId, ref: 'User', required: false })
     solvedUserId: Types.ObjectId;
 
     @Prop({ enum: ReportStatus, default: ReportStatus.UNDER_REVIEW })
