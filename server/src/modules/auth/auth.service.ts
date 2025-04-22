@@ -1,4 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { SignupDto } from './dto/signup.dto';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, } from 'src/schema/user.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
-export class AuthService {}
+export class AuthService {
+    constructor(
+        private readonly jwtService: JwtService,
+        @InjectModel(User.name) private readonly userModel: Model<User>
+    ) { }
+
+    async signup(signupDto: SignupDto) {
+        const { name, email, password, role } = signupDto;
+
+        // Check if user already exists
+        const existingUser = await this.userModel.findOne({ email });
+        if (existingUser) {
+            throw new ConflictException('User with this email already exists');
+        }
+
+        try {
+            // Hash the password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Create new user
+            const newUser = new this.userModel({
+                name,
+                email,
+                password: hashedPassword,
+                role,
+            });
+
+            const savedUser = await newUser.save();
+
+            // Sign JWT token with user ID
+            const token = await this.jwtService.signAsync({ id: savedUser._id });
+
+            // Return token and user info (excluding password)
+            return {
+                message: 'Signup successful',
+                token,
+                user: {
+                    id: savedUser._id,
+                    name: savedUser.name,
+                    email: savedUser.email,
+                    role: savedUser.role,
+                },
+            };
+        } catch (error) {
+            console.error('Signup error:', error);
+            throw new InternalServerErrorException('Failed to create user');
+        }
+    }
+}
