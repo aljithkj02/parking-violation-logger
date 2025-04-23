@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Report } from 'src/schema/report.schema';
 import { isValidObjectId } from 'mongoose';
-import { ReportStatus } from 'src/common/enums';
+import { ReportStatus, Role } from 'src/common/enums';
 import { QueryDto } from './dto/query.dto';
 
 @Injectable()
@@ -17,15 +17,16 @@ export class ReportService {
     async getReports(user: RequestUser, { page, limit, filter }: QueryDto) {
         try {
             const skip = (page - 1) * limit;
+            const isAdmin = user.role === Role.ADMIN;
 
             const [total, reports] = await Promise.all([
-                this.reportModel.countDocuments({ 
-                    reportedUserId: user.id,
+                this.reportModel.countDocuments({
+                    ...(!isAdmin && { reportedUserId: user.id }),
                     ...(filter && { status: filter })
                 }),
                 this.reportModel
-                    .find({ 
-                        reportedUserId: user.id ,
+                    .find({
+                        ...(!isAdmin && { reportedUserId: user.id }),
                         ...(filter && { status: filter })
                     })
                     .skip(skip)
