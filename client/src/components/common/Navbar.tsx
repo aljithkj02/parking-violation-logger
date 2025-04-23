@@ -75,7 +75,7 @@ export const Navbar = ({ setSidebarOpen }: NavbarProps) => {
             </nav>
 
             {/* Dialog Box for Logout Confirmation */}
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} className="relative z-50">
                 <Dialog.Panel className="fixed inset-0 bg-black opacity-50" />
 
                 <div className="fixed inset-0 flex items-center justify-center p-4">

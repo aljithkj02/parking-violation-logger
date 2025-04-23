@@ -8,6 +8,8 @@ import { Profile } from '../pages/Profile';
 import { Layout } from '../layouts/Layout';
 import { Home } from '../pages/Home';
 import { AdminProtectedRoute } from './AdminProtectedRoute';
+import { PublicRoute } from './PublicRoute';
+import { NotFound } from '../pages/NotFound';
 
 
 const AppRouter = () => {
@@ -16,8 +18,10 @@ const AppRouter = () => {
         <BrowserRouter>
             <Routes>
                 {/* Public routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+                <Route element={<PublicRoute />}>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                </Route>
 
                 {/* Protected routes with layout */}
                 <Route element={<ProtectedRoute />}>
@@ -35,7 +39,7 @@ const AppRouter = () => {
                 </Route>
 
                 {/* Fallback */}
-                <Route path="*" element={<Login />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
     );
