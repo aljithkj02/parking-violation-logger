@@ -38,7 +38,7 @@ export class AuthService {
             const savedUser = await newUser.save();
 
             // Sign JWT token with user ID
-            const token = await this.jwtService.signAsync({ id: savedUser._id });
+            const token = await this.jwtService.signAsync({ id: savedUser._id, role });
 
             // Return token and user info (excluding password)
             return {
@@ -75,7 +75,7 @@ export class AuthService {
             }
 
             // Sign JWT token with user ID
-            const token = await this.jwtService.signAsync({ id: user._id });
+            const token = await this.jwtService.signAsync({ id: user._id, role: user.role });
 
             // Return token and user info (excluding password)
             return {
