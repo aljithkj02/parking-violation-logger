@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { CreateReportDto } from './dto/create-report.dto';
 import { RequestUser } from 'src/common/type';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Report } from 'src/schema/report.schema';
 import { isValidObjectId } from 'mongoose';
 import { ReportStatus, Role } from 'src/common/enums';
@@ -180,6 +180,7 @@ export class ReportService {
 
             // Apply updates
             existingReport.status = status;
+            existingReport.solvedUserId = user.id as unknown as Types.ObjectId;
 
             const updated = await existingReport.save();
 
