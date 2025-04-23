@@ -1,15 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { AuthMode } from '../../utils/types';
 import { useLogin } from '../../hooks/auth/useLogin';
 
 export const Login = () => {
     const {
-        authMode,
         form,
         handleChange,
         handleLogin,
-        setAuthMode
     } = useLogin();
 
     return (
@@ -20,24 +17,9 @@ export const Login = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
             >
-                {/* Auth mode switch */}
-                <div className="flex justify-between mb-6">
-                    {(['user', 'admin'] as AuthMode[]).map((mode) => (
-                        <button
-                            key={mode}
-                            onClick={() => setAuthMode(mode)}
-                            className={`flex-1 py-2 mx-1 rounded-full font-medium transition-all duration-200 ${authMode === mode
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-200 text-gray-700'
-                                }`}
-                        >
-                            {mode === 'user' ? 'User Mode' : 'Admin Mode'}
-                        </button>
-                    ))}
-                </div>
 
                 <h2 className="text-2xl font-bold text-center text-slate-800 mb-6">
-                    {authMode === 'admin' ? 'Admin Login' : 'User Login'}
+                    Login
                 </h2>
 
                 {/* Form */}

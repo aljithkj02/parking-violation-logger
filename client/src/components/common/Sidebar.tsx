@@ -12,6 +12,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
     const links = [
         ...(isAdmin ? [{ name: "Dashboard", to: "/dashboard"}]: []),
+        ...(isAdmin ? []: [{ name: "Home", to: "/"}]),
         { name: isAdmin ? "Reports": "My Reports", to: "/reports" },
         { name: "Profile", to: "/profile"},
     ];

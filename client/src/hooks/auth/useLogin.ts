@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthMode } from '../../utils/types';
 import { useAppDispatch } from '../useAppDispatch';
 import { login } from '../../api/auth';
 import { setCredentials } from '../../store/slices/authSlice';
@@ -11,7 +10,6 @@ interface LoginForm {
 }
 
 export const useLogin = () => {
-    const [authMode, setAuthMode] = useState<AuthMode>('user');
     const [form, setForm] = useState<LoginForm>({ email: '', password: '' });
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -24,8 +22,7 @@ export const useLogin = () => {
         e.preventDefault();
 
         try {
-            const role = authMode === 'admin' ? 'ADMIN' : 'USER';
-            const res = await login({ ...form, role });
+            const res = await login({ ...form });
 
             if (res) {
                 dispatch(setCredentials(res));
@@ -37,11 +34,9 @@ export const useLogin = () => {
     };
 
     return {
-        authMode,
         form,
         handleChange,
         handleLogin,
-        setAuthMode
     };
 };
 
