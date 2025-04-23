@@ -1,25 +1,16 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { AuthMode } from '../../utils/types';
+import { useSignup } from '../../hooks/auth/useSignup';
 
 export const Signup = () => {
-    const [authMode, setAuthMode] = useState<AuthMode>('user');
-    const [form, setForm] = useState({
-        name: '',
-        email: '',
-        password: '',
-    });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Signing up:', { ...form, role: authMode });
-        // API call here
-    };
+    const {
+        authMode,
+        form,
+        handleChange,
+        handleSubmit,
+        setAuthMode
+    } = useSignup();
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -29,15 +20,15 @@ export const Signup = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
             >
-                {/* Mode Switch */}
+                {/* Auth mode switch */}
                 <div className="flex justify-between mb-6">
                     {(['user', 'admin'] as AuthMode[]).map((mode) => (
                         <button
                             key={mode}
                             onClick={() => setAuthMode(mode)}
                             className={`flex-1 py-2 mx-1 rounded-full font-medium transition-all duration-200 ${authMode === mode
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-gray-200 text-gray-700'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-gray-200 text-gray-700'
                                 }`}
                         >
                             {mode === 'user' ? 'User Mode' : 'Admin Mode'}
@@ -118,4 +109,3 @@ export const Signup = () => {
         </div>
     );
 };
-

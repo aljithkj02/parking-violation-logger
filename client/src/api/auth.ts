@@ -31,6 +31,9 @@ export const signup = async (data: SignupPayload): Promise<AuthResponse | null> 
         const res = await api.post("/auth/signup", data);
         toast.dismiss();
         toast.success("Signup successful!");
+
+        localStorage.setItem("token", res.data.token);
+
         return res.data;
     } catch (error: any) {
         toast.dismiss();
@@ -44,6 +47,9 @@ export const login = async (data: LoginPayload): Promise<AuthResponse | null> =>
         const res = await api.post("/auth/login", data);
         toast.dismiss();
         toast.success("Login successful!");
+
+        localStorage.setItem("token", res.data.token);
+        
         return res.data;
     } catch (error: any) {
         toast.dismiss();
