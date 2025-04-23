@@ -33,6 +33,7 @@ export const signup = async (data: SignupPayload): Promise<AuthResponse | null> 
         toast.success("Signup successful!");
 
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
 
         return res.data;
     } catch (error: any) {
@@ -49,7 +50,8 @@ export const login = async (data: LoginPayload): Promise<AuthResponse | null> =>
         toast.success("Login successful!");
 
         localStorage.setItem("token", res.data.token);
-        
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+
         return res.data;
     } catch (error: any) {
         toast.dismiss();

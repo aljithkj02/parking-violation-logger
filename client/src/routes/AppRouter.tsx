@@ -1,25 +1,36 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { Login } from '../pages/auth/Login';
 import { Signup } from '../pages/auth/Signup';
-import { Home } from '../pages/Home';
 import { Reports } from '../pages/Reports';
+import { ProtectedRoute } from './ProtectedRoute';
+import { Dashboard } from '../pages/Dashboard';
+import { Profile } from '../pages/Profile';
+import { Layout } from '../layouts/Layout';
 
 
 const AppRouter = () => {
-    const isAuthenticated = false; // Replace with auth logic
-    const isAdmin = false; // Replace with role from Redux
 
     return (
-        <Routes>
-            <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/home" element={<Home />} />
-            <Route
-                path="/reports"
-                element={isAuthenticated ? <Reports /> : <Navigate to="/login" />}
-            />
-        </Routes>
+
+        <BrowserRouter>
+            <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+
+                {/* Protected routes with layout */}
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<Layout />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/reports" element={<Reports />} />
+                        <Route path="/profile" element={<Profile />} />
+                    </Route>
+                </Route>
+
+                {/* Fallback */}
+                <Route path="*" element={<Login />} />
+            </Routes>
+        </BrowserRouter>
     );
 };
 
