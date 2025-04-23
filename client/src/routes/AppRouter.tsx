@@ -6,12 +6,13 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { Dashboard } from '../pages/Dashboard';
 import { Profile } from '../pages/Profile';
 import { Layout } from '../layouts/Layout';
+import { Home } from '../pages/Home';
+import { AdminProtectedRoute } from './AdminProtectedRoute';
 
 
 const AppRouter = () => {
 
     return (
-
         <BrowserRouter>
             <Routes>
                 {/* Public routes */}
@@ -21,9 +22,15 @@ const AppRouter = () => {
                 {/* Protected routes with layout */}
                 <Route element={<ProtectedRoute />}>
                     <Route element={<Layout />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/" element={<Home />} />
                         <Route path="/reports" element={<Reports />} />
                         <Route path="/profile" element={<Profile />} />
+
+
+                        {/* Admin-only route */}
+                        <Route element={<AdminProtectedRoute />}>
+                            <Route path="/dashboard" element={<Dashboard />} />
+                        </Route>u
                     </Route>
                 </Route>
 

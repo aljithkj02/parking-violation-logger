@@ -1,16 +1,22 @@
 import { NavLink } from "react-router-dom";
 
-const links = [
-    { name: "Dashboard", to: "/dashboard" },
-    { name: "Profile", to: "/profile" },
-];
-
 interface SidebarProps {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}'); 
+
+    const isAdmin = user.role === "ADMIN";
+
+    const links = [
+        ...(isAdmin ? [{ name: "Dashboard", to: "/dashboard"}]: []),
+        { name: isAdmin ? "Reports": "My Reports", to: "/reports" },
+        { name: "Profile", to: "/profile"},
+    ];
+    
+
     return (
         <>
             {/* Mobile overlay */}
