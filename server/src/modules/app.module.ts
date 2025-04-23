@@ -7,6 +7,7 @@ import { ReportModule } from './report/report.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { JwtService } from '@nestjs/jwt';
         PassportModule.register({ defaultStrategy: 'jwt' }),
         AuthModule,
         ReportModule,
+        UploadModule
     ],
     controllers: [],
     providers: [JwtStrategy, JwtService],
