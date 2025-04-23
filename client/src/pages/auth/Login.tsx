@@ -1,22 +1,16 @@
-// src/pages/auth/Login.tsx
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { AuthMode } from '../../utils/types';
+import { useLogin } from '../../hooks/auth/useLogin';
 
 export const Login = () => {
-    const [authMode, setAuthMode] = useState<AuthMode>('user');
-    const [form, setForm] = useState({ email: '', password: '' });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Logging in:', { ...form, role: authMode });
-        // API call here
-    };
+    const {
+        authMode,
+        form,
+        handleChange,
+        handleLogin,
+        setAuthMode
+    } = useLogin();
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -33,8 +27,8 @@ export const Login = () => {
                             key={mode}
                             onClick={() => setAuthMode(mode)}
                             className={`flex-1 py-2 mx-1 rounded-full font-medium transition-all duration-200 ${authMode === mode
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-gray-200 text-gray-700'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-gray-200 text-gray-700'
                                 }`}
                         >
                             {mode === 'user' ? 'User Mode' : 'Admin Mode'}
@@ -47,7 +41,7 @@ export const Login = () => {
                 </h2>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-5">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email Address
@@ -99,4 +93,3 @@ export const Login = () => {
         </div>
     );
 };
-

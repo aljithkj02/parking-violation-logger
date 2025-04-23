@@ -29,9 +29,11 @@ export interface AuthResponse {
 export const signup = async (data: SignupPayload): Promise<AuthResponse | null> => {
     try {
         const res = await api.post("/auth/signup", data);
+        toast.dismiss();
         toast.success("Signup successful!");
         return res.data;
     } catch (error: any) {
+        toast.dismiss();
         toast.error(error?.response?.data?.message || "Signup failed");
         return null;
     }
@@ -40,9 +42,11 @@ export const signup = async (data: SignupPayload): Promise<AuthResponse | null> 
 export const login = async (data: LoginPayload): Promise<AuthResponse | null> => {
     try {
         const res = await api.post("/auth/login", data);
+        toast.dismiss();
         toast.success("Login successful!");
         return res.data;
     } catch (error: any) {
+        toast.dismiss();
         toast.error(error?.response?.data?.message || "Login failed");
         return null;
     }
