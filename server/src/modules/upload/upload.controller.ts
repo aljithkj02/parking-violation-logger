@@ -25,15 +25,13 @@ export class UploadController {
         if (!files || files.length === 0) {
             throw new BadRequestException('At least one file must be uploaded');
         }
-        return true;
+        const urls = await Promise.all(
+            files.map(file => this.cloudinaryService.uploadFile(file)),
+        );
 
-        // const urls = await Promise.all(
-        //     files.map(file => this.cloudinaryService.uploadFile(file)),
-        // );
-
-        // return {
-        //     status: true,
-        //     data: urls
-        // };
+        return {
+            status: true,
+            data: urls
+        };
     }
 }
