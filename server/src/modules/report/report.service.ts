@@ -139,14 +139,16 @@ export class ReportService {
                 throw new NotFoundException('Report not found');
             }
 
-            if (existingReport.reportedUserId.toString() !== user.id) {
-                throw new ForbiddenException('You are not authorized to update this report');
+            if (user.role === Role.USER) {
+                if (existingReport.reportedUserId.toString() !== user.id) {
+                    throw new ForbiddenException('You are not authorized to update this report');
+                }
+    
+                if (existingReport.status === ReportStatus.ACTION_TAKEN) {
+                    throw new BadRequestException("Already taken action for this report!");
+                }
+    
             }
-
-            if (existingReport.status === ReportStatus.ACTION_TAKEN) {
-                throw new BadRequestException("Already taken action for this report!");
-            }
-
 
             await this.reportModel.deleteOne({ _id: reportId });
 
