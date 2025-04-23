@@ -5,6 +5,8 @@ import { Request } from 'express';
 import { CreateReportDto } from './dto/create-report.dto';
 import { RequestUser } from 'src/common/type';
 import { QueryDto } from './dto/query.dto';
+import { RoleGuard } from 'src/guard/role.guard';
+import { ResolveReportDto } from './dto/resolve-report.dto';
 
 @Controller('report')
 @UseGuards(JwtAuthGuard)
@@ -42,5 +44,16 @@ export class ReportController {
         @Param("id") reportId: string,
     ) {
         return this.reportService.deleteReport(reportId, req.user as RequestUser);
+    }
+
+
+    @Put('resolve/:id')
+    @UseGuards(RoleGuard)
+    resolveReport(
+        @Req() req: Request,
+        @Param("id") reportId: string,
+        @Body() resolveReportDto: ResolveReportDto
+    ) {
+        return this.reportService.resolveReport(reportId, resolveReportDto, req.user as RequestUser);
     }
 }

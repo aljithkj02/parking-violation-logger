@@ -7,6 +7,7 @@ import { Report } from 'src/schema/report.schema';
 import { isValidObjectId } from 'mongoose';
 import { ReportStatus, Role } from 'src/common/enums';
 import { QueryDto } from './dto/query.dto';
+import { ResolveReportDto } from './dto/resolve-report.dto';
 
 @Injectable()
 export class ReportService {
@@ -159,4 +160,35 @@ export class ReportService {
         }
     }
 
+    async resolveReport(reportId: string, { status }: ResolveReportDto, user: RequestUser) {
+        try {
+            if (!isValidObjectId(reportId)) {
+                throw new BadRequestException('Invalid report ID');
+            }
+
+            if (!user?.id) {
+                throw new BadRequestException('User ID is missing');
+            }
+
+            const existingReport = await this.reportModel.findById(reportId);
+
+            if (!existingReport) {
+                throw new NotFoundException('Report not found');
+            }
+
+            // Apply updates
+            existingReport.status = status;
+
+            const updated = await existingReport.save();
+
+            return {
+                status: true,
+                message: 'Report updated successfully',
+                data: updated,
+            };
+        } catch (error) {
+            console.error('Error resolving report:', error);
+            throw new BadRequestException(error?.message || 'Failed to resolve report');
+        }
+    }
 }
