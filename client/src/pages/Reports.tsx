@@ -55,7 +55,7 @@ export const Reports = () => {
 
             {selectedReport && (
                 <ReportModal report={selectedReport} onClose={() => setSelectedReport(null)}
-                    onUpdate={refetchReports}
+                    onUpdate={refetchReports} mode="edit"
                 />
             )}
         </div>

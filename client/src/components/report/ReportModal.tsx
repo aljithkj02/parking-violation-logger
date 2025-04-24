@@ -7,31 +7,36 @@ import { uploadFiles } from "../../api/upload";
 import { Report } from "../../utils/report.type";
 import { useUpdateReport } from "../../hooks/report/useUpdateReport";
 import { useDeleteReport } from "../../hooks/report/useDeleteReport";
+import { useCreateReport } from "../../hooks/report/useCreateReport";
 
 interface Props {
-    report: Report;
+    report?: Report;
+    mode: "create" | "edit";
     onClose: () => void;
     onUpdate: () => void;
 }
 
-export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
+export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
     const [current, setCurrent] = useState(0);
     const [fullscreen, setFullscreen] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [text, setText] = useState(report.text);
-    const [location, setLocation] = useState(report.location);
-    const [assets, setAssets] = useState<string[]>(report.assets);
+    const [isEditing, setIsEditing] = useState(mode === "create");
+    const [text, setText] = useState(report?.text || "");
+    const [location, setLocation] = useState(report?.location || "");
+    const [assets, setAssets] = useState<string[]>(report?.assets || []);
     const [loading, setLoading] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const { mutate: updateReport } = useUpdateReport();
     const { mutate: deleteReport, isLoading: isDeleting } = useDeleteReport();
+    const { mutate: createReport } = useCreateReport();
 
     const resetEditState = () => {
-        setText(report.text);
-        setLocation(report.location);
-        setAssets(report.assets);
-        setCurrent(0);
+        if (report) {
+            setText(report.text);
+            setLocation(report.location);
+            setAssets(report.assets);
+            setCurrent(0);
+        }
     };
 
     const handleRemoveImage = (index: number) => {
@@ -56,15 +61,24 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
         }
     };
 
-    const handleUpdate = async () => {
-        const success = await updateReport(report._id, { text, location, assets });
-        if (success) {
-            onUpdate();
-            onClose();
+    const handleSubmit = async () => {
+        if (mode === "edit" && report) {
+            const success = await updateReport(report._id, { text, location, assets });
+            if (success) {
+                onUpdate();
+                onClose();
+            }
+        } else if (mode === "create") {
+            const success = await createReport({ text, location, assets });
+            if (success) {
+                onUpdate();
+                onClose();
+            }
         }
     };
 
     const handleDelete = () => {
+        if (!report) return;
         deleteReport(report._id, {
             onSuccess: () => {
                 onUpdate();
@@ -74,7 +88,7 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
     };
 
     const toggleEdit = () => {
-        if (isEditing) {
+        if (isEditing && mode === "edit") {
             resetEditState();
         }
         setIsEditing(!isEditing);
@@ -93,23 +107,25 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
 
                     <div className="p-6 flex flex-col gap-4">
                         {/* Main Image */}
-                        <div className="relative w-full h-96 rounded-xl overflow-hidden">
-                            <img
-                                src={assets[current]}
-                                alt={`report-${current}`}
-                                className="w-full h-full object-cover rounded-xl cursor-pointer"
-                                onClick={() => setFullscreen(true)}
-                            />
-                            <div className="absolute bottom-3 right-3 bg-white/70 rounded-full p-1 cursor-pointer" onClick={() => setFullscreen(true)}>
-                                <Maximize2 size={18} />
-                            </div>
-
-                            {loading && (
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl z-10">
-                                    <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                        {assets.length > 0 && (
+                            <div className="relative w-full h-96 rounded-xl overflow-hidden">
+                                <img
+                                    src={assets[current]}
+                                    alt={`report-${current}`}
+                                    className="w-full h-full object-cover rounded-xl cursor-pointer"
+                                    onClick={() => setFullscreen(true)}
+                                />
+                                <div className="absolute bottom-3 right-3 bg-white/70 rounded-full p-1 cursor-pointer" onClick={() => setFullscreen(true)}>
+                                    <Maximize2 size={18} />
                                 </div>
-                            )}
-                        </div>
+
+                                {loading && (
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl z-10">
+                                        <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Thumbnails */}
                         {assets.length > 1 && (
@@ -156,40 +172,36 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
                                 <p className="text-sm text-gray-600">📍 Location: {location}</p>
                             )}
 
-                            <p className={`text-sm font-medium ${report.status === "UNDER_REVIEW" ? "text-yellow-600" : "text-green-600"}`}>
-                                Status: {report.status.replace("_", " ")}
-                            </p>
-                            <p className="text-xs text-gray-500">🕒 Created: {moment(report.createdAt).format("LLL")}</p>
-                            <p className="text-xs text-gray-400">Last Updated: {moment(report.updatedAt).fromNow()}</p>
+                            {report && mode === "edit" && (
+                                <>
+                                    <p className={`text-sm font-medium ${report.status === "UNDER_REVIEW" ? "text-yellow-600" : "text-green-600"}`}>
+                                        Status: {report.status.replace("_", " ")}
+                                    </p>
+                                    <p className="text-xs text-gray-500">🕒 Created: {moment(report.createdAt).format("LLL")}</p>
+                                    <p className="text-xs text-gray-400">Last Updated: {moment(report.updatedAt).fromNow()}</p>
+                                </>
+                            )}
                         </div>
 
-                        {report.status === "UNDER_REVIEW" && (
-                            <div className="flex justify-end flex-wrap gap-2 mt-4">
-                                <button
-                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 disabled:opacity-50"
-                                    onClick={openDeleteModal}
-                                    disabled={isDeleting}
-                                >
+                        <div className="flex justify-end flex-wrap gap-2 mt-4">
+                            {mode === "edit" && report?.status === "UNDER_REVIEW" && (
+                                <button className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 disabled:opacity-50" onClick={openDeleteModal} disabled={isDeleting}>
                                     <Trash2 size={16} className="inline mr-1" /> {isDeleting ? "Deleting..." : "Delete"}
                                 </button>
+                            )}
 
-                                {isEditing && (
-                                    <button
-                                        className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200"
-                                        onClick={handleUpdate}
-                                    >
-                                        <Save size={16} className="inline mr-1" /> Save Changes
-                                    </button>
-                                )}
+                            {isEditing && (
+                                <button className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200" onClick={handleSubmit}>
+                                    <Save size={16} className="inline mr-1" /> {mode === "create" ? "Create Report" : "Save Changes"}
+                                </button>
+                            )}
 
-                                <button
-                                    className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200"
-                                    onClick={toggleEdit}
-                                >
+                            {mode === "edit" && (
+                                <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200" onClick={toggleEdit}>
                                     <Edit3 size={16} className="inline mr-1" /> {isEditing ? "Cancel Edit" : "Edit"}
                                 </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </motion.div>
 
@@ -205,32 +217,15 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
 
                 {/* Delete Confirmation Modal */}
                 {isDeleteModalOpen && (
-                    <motion.div
-                        className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <motion.div
-                            className="bg-white rounded-xl shadow-xl w-96 p-6"
-                            initial={{ scale: 0.95 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.95 }}
-                            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                        >
+                    <motion.div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                        <motion.div className="bg-white rounded-xl shadow-xl w-96 p-6" initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}>
                             <div className="flex flex-col gap-4">
                                 <h3>Are you sure you want to delete this report?</h3>
                                 <div className="flex justify-end gap-2">
-                                    <button
-                                        className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200"
-                                        onClick={closeDeleteModal}
-                                    >
+                                    <button className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200" onClick={closeDeleteModal}>
                                         Cancel
                                     </button>
-                                    <button
-                                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                                        onClick={handleDelete}
-                                    >
+                                    <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700" onClick={handleDelete}>
                                         {isDeleting ? "Deleting..." : "Delete"}
                                     </button>
                                 </div>
