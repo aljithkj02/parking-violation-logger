@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { useReports } from "../hooks/report/useReports";
 import { ReportCard } from "../components/report/ReportCard";
+import { Report } from "../api/report";
+import { ReportModal } from "../components/report/ReportModal";
 
 export const Reports = () => {
     const [page, setPage] = useState(1);
     const [limit] = useState(5);
+    const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+
     const { data, loading, error, totalPages } = useReports(page, limit);
 
 
@@ -24,7 +28,9 @@ export const Reports = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.map((report) => (
-                        <ReportCard key={report.id} report={report} />
+                        <div onClick={() => setSelectedReport(report)}>
+                            <ReportCard report={report} />
+                        </div>
                     ))}
 
                 </div>
@@ -46,6 +52,10 @@ export const Reports = () => {
                     Next
                 </button>
             </div>
+
+            {selectedReport && (
+                <ReportModal report={selectedReport} onClose={() => setSelectedReport(null)} />
+            )}
         </div>
     );
 };
