@@ -28,7 +28,7 @@ export const Reports = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.map((report) => (
-                        <div onClick={() => setSelectedReport(report)}>
+                        <div key={report.id} onClick={() => setSelectedReport(report)}>
                             <ReportCard report={report} />
                         </div>
                     ))}
