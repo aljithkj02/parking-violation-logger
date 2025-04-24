@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useReports } from "../hooks/report/useReports";
 import { ReportCard } from "../components/report/ReportCard";
-import { Report } from "../api/report";
 import { ReportModal } from "../components/report/ReportModal";
+import { Report } from "../utils/report.type";
 
 export const Reports = () => {
     const [page, setPage] = useState(1);

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getReports, Report, ReportFilter } from "../../api/report";
+import { getReports } from "../../api/report";
+import { Report, ReportFilter } from "../../utils/report.type";
 
 interface ReportState {
     data: Report[];

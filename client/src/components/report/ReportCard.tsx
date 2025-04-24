@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Report } from "../../api/report";
+import { Report } from "../../utils/report.type";
 
 interface Props {
     report: Report;

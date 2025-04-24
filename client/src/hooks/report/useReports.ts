@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { ReportFilter } from "../../api/report";
 import { useAppDispatch } from "../useAppDispatch";
 import { useAppSelector } from "../useAppSelector";
 import { fetchReports } from "../../store/slices/reportSlice";
+import { ReportFilter } from "../../utils/report.type";
 
 export const useReports = (page: number, limit: number, filter?: ReportFilter) => {
     const dispatch = useAppDispatch();

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Report } from "../../api/report";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Maximize2, Trash2, Edit3, Plus } from "lucide-react";
 import moment from "moment";
 import { uploadFiles } from "../../api/upload";
+import { Report } from "../../utils/report.type";
 
 interface Props {
     report: Report;
