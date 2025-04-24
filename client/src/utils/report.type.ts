@@ -1,7 +1,7 @@
 export type ReportFilter = "UNDER_REVIEW" | "ACTION_TAKEN";
 
 export interface Report {
-    id: string;
+    _id: string;
     text: string;
     location: string;
     assets: string[];

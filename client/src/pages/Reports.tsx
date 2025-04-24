@@ -9,7 +9,7 @@ export const Reports = () => {
     const [limit] = useState(5);
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-    const { data, loading, error, totalPages } = useReports(page, limit);
+    const { data, loading, error, totalPages, refetchReports } = useReports(page, limit);
 
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -28,7 +28,7 @@ export const Reports = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {data.map((report) => (
-                        <div key={report.id} onClick={() => setSelectedReport(report)}>
+                        <div key={report._id} onClick={() => setSelectedReport(report)}>
                             <ReportCard report={report} />
                         </div>
                     ))}
@@ -54,7 +54,9 @@ export const Reports = () => {
             </div>
 
             {selectedReport && (
-                <ReportModal report={selectedReport} onClose={() => setSelectedReport(null)} />
+                <ReportModal report={selectedReport} onClose={() => setSelectedReport(null)}
+                    onUpdate={refetchReports}
+                />
             )}
         </div>
     );
