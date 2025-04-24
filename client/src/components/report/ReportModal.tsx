@@ -6,6 +6,7 @@ import moment from "moment";
 import { uploadFiles } from "../../api/upload";
 import { Report } from "../../utils/report.type";
 import { useUpdateReport } from "../../hooks/report/useUpdateReport";
+import { useDeleteReport } from "../../hooks/report/useDeleteReport";
 
 interface Props {
     report: Report;
@@ -21,8 +22,10 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
     const [location, setLocation] = useState(report.location);
     const [assets, setAssets] = useState<string[]>(report.assets);
     const [loading, setLoading] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-    const { mutate } = useUpdateReport();
+    const { mutate: updateReport } = useUpdateReport();
+    const { mutate: deleteReport, isLoading: isDeleting } = useDeleteReport();
 
     const resetEditState = () => {
         setText(report.text);
@@ -54,11 +57,20 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
     };
 
     const handleUpdate = async () => {
-        const success = await mutate(report._id, { text, location, assets });
+        const success = await updateReport(report._id, { text, location, assets });
         if (success) {
             onUpdate();
             onClose();
         }
+    };
+
+    const handleDelete = () => {
+        deleteReport(report._id, {
+            onSuccess: () => {
+                onUpdate();
+                onClose();
+            },
+        });
     };
 
     const toggleEdit = () => {
@@ -67,6 +79,9 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
         }
         setIsEditing(!isEditing);
     };
+
+    const openDeleteModal = () => setIsDeleteModalOpen(true);
+    const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
     return createPortal(
         <AnimatePresence>
@@ -151,10 +166,11 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
                         {report.status === "UNDER_REVIEW" && (
                             <div className="flex justify-end flex-wrap gap-2 mt-4">
                                 <button
-                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200"
-                                    onClick={() => console.log("Delete logic here")}
+                                    className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 disabled:opacity-50"
+                                    onClick={openDeleteModal}
+                                    disabled={isDeleting}
                                 >
-                                    <Trash2 size={16} className="inline mr-1" /> Delete
+                                    <Trash2 size={16} className="inline mr-1" /> {isDeleting ? "Deleting..." : "Delete"}
                                 </button>
 
                                 {isEditing && (
@@ -184,6 +200,42 @@ export const ReportModal = ({ report, onClose, onUpdate }: Props) => {
                         <button className="absolute top-5 right-5 text-white">
                             <X size={30} />
                         </button>
+                    </motion.div>
+                )}
+
+                {/* Delete Confirmation Modal */}
+                {isDeleteModalOpen && (
+                    <motion.div
+                        className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="bg-white rounded-xl shadow-xl w-96 p-6"
+                            initial={{ scale: 0.95 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                        >
+                            <div className="flex flex-col gap-4">
+                                <h3>Are you sure you want to delete this report?</h3>
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-200"
+                                        onClick={closeDeleteModal}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                                        onClick={handleDelete}
+                                    >
+                                        {isDeleting ? "Deleting..." : "Delete"}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </motion.div>
