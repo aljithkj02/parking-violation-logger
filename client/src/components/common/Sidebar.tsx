@@ -23,7 +23,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             {/* Mobile overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
+                    className="fixed inset-0 bg-black opacity-40 z-30 md:hidden"
                     onClick={() => setIsOpen(false)}
                 />
             )}

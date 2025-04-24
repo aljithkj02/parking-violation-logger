@@ -1,9 +1,10 @@
 import { Menu, User } from "lucide-react";
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/authSlice";
+import { useAppSelector } from "../../hooks/useAppSelector";
 
 interface NavbarProps {
     setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,7 +15,7 @@ export const Navbar = ({ setSidebarOpen }: NavbarProps) => {
     const navigate = useNavigate();
 
     // Check if the user info exists in the redux slice or localStorage
-    const userFromRedux = useSelector((state: any) => state.auth.user);
+    const userFromRedux = useAppSelector((state) => state.auth.user);
     const userName = userFromRedux?.name || JSON.parse(localStorage.getItem("user") || "{}")?.name;
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -36,7 +37,7 @@ export const Navbar = ({ setSidebarOpen }: NavbarProps) => {
 
     return (
         <>
-            <nav className="h-16 bg-white shadow fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 md:px-6">
+            <nav className="h-16 bg-white shadow fixed top-0 left-0 right-0 z-30 flex items-center justify-between md:justify-end px-4 md:px-6">
                 {/* Sidebar toggle button for mobile */}
                 <button
                     onClick={() => setSidebarOpen((prev) => !prev)}
@@ -44,9 +45,6 @@ export const Navbar = ({ setSidebarOpen }: NavbarProps) => {
                 >
                     <Menu size={24} />
                 </button>
-
-                {/* App title */}
-                <h1 className="text-xl font-bold text-gray-800">My Dashboard</h1>
 
                 {/* Right side - User Icon and Dropdown */}
                 <div className="flex items-center space-x-4">
