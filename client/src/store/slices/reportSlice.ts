@@ -4,6 +4,7 @@ import { Report, ReportFilter } from "../../utils/report.type";
 
 interface ReportState {
     data: Report[];
+    refetch: boolean;
     loading: boolean;
     error: string | null;
     total: number;
@@ -14,6 +15,7 @@ interface ReportState {
 const initialState: ReportState = {
     data: [],
     loading: false,
+    refetch: false,
     error: null,
     total: 0,
     currentPage: 1,
@@ -39,7 +41,11 @@ export const fetchReports = createAsyncThunk(
 const reportSlice = createSlice({
     name: "reports",
     initialState,
-    reducers: {},
+    reducers: {
+        refetchData: (state) => {
+            state.refetch = !state.refetch;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchReports.pending, (state) => {
@@ -60,4 +66,5 @@ const reportSlice = createSlice({
     },
 });
 
+export const { refetchData } = reportSlice.actions;
 export default reportSlice.reducer;

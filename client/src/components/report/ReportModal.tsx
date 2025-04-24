@@ -161,13 +161,15 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                         {/* Details */}
                         <div className="flex flex-col gap-2">
                             {isEditing ? (
-                                <textarea value={text} onChange={(e) => setText(e.target.value)} className="border rounded-lg p-2 w-full" rows={3} />
+                                <textarea 
+                                    placeholder="Describe the issue or provide more details..." 
+                                    value={text} onChange={(e) => setText(e.target.value)} className="border rounded-lg p-2 w-full" rows={3} />
                             ) : (
                                 <p className="text-xl font-semibold text-gray-800">{text}</p>
                             )}
 
                             {isEditing ? (
-                                <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} className="border rounded-lg p-2 text-sm" />
+                                <input type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} className="border rounded-lg p-2 text-sm" />
                             ) : (
                                 <p className="text-sm text-gray-600">📍 Location: {location}</p>
                             )}

@@ -3,14 +3,17 @@ import { useReports } from "../hooks/report/useReports";
 import { ReportCard } from "../components/report/ReportCard";
 import { ReportModal } from "../components/report/ReportModal";
 import { Report } from "../utils/report.type";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { refetchData } from "../store/slices/reportSlice";
 
 export const Reports = () => {
     const [page, setPage] = useState(1);
     const [limit] = useState(5);
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
-    const { data, loading, error, totalPages, refetchReports } = useReports(page, limit);
+    const { data, loading, error, totalPages } = useReports(page, limit);
 
+    const dispatch = useAppDispatch();
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -55,7 +58,7 @@ export const Reports = () => {
 
             {selectedReport && (
                 <ReportModal report={selectedReport} onClose={() => setSelectedReport(null)}
-                    onUpdate={refetchReports} mode="edit"
+                    onUpdate={() => dispatch(refetchData())} mode="edit"
                 />
             )}
         </div>
