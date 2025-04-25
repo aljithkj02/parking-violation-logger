@@ -4,10 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Maximize2, Trash2, Edit3, Plus, Save } from "lucide-react";
 import moment from "moment";
 import { uploadFiles } from "../../api/upload";
-import { Report } from "../../utils/report.type";
+import { Report, ReportFilter } from "../../utils/report.type";
 import { useUpdateReport } from "../../hooks/report/useUpdateReport";
 import { useDeleteReport } from "../../hooks/report/useDeleteReport";
 import { useCreateReport } from "../../hooks/report/useCreateReport";
+import { resolveReport } from "../../api/report";
 
 interface Props {
     report?: Report;
@@ -24,7 +25,8 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
     const [location, setLocation] = useState(report?.location || "");
     const [assets, setAssets] = useState<string[]>(report?.assets || []);
     const [loading, setLoading] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); const [isResolveMode, setIsResolveMode] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<ReportFilter>(report?.status || "UNDER_REVIEW");
 
     const { mutate: updateReport } = useUpdateReport();
     const { mutate: deleteReport, isLoading: isDeleting } = useDeleteReport();
@@ -97,6 +99,9 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
     const openDeleteModal = () => setIsDeleteModalOpen(true);
     const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const isAdmin = user?.role === "ADMIN";
+
     return createPortal(
         <AnimatePresence>
             <motion.div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -161,8 +166,8 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                         {/* Details */}
                         <div className="flex flex-col gap-2">
                             {isEditing ? (
-                                <textarea 
-                                    placeholder="Describe the issue or provide more details..." 
+                                <textarea
+                                    placeholder="Describe the issue or provide more details..."
                                     value={text} onChange={(e) => setText(e.target.value)} className="border rounded-lg p-2 w-full" rows={3} />
                             ) : (
                                 <p className="text-xl font-semibold text-gray-800">{text}</p>
@@ -183,10 +188,46 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                                     <p className="text-xs text-gray-400">Last Updated: {moment(report.updatedAt).fromNow()}</p>
                                 </>
                             )}
+
+                            {isAdmin && mode === "edit" && (
+                                <>
+                                    {isResolveMode ? (
+                                        <div className="flex items-center justify-between gap-2">
+                                            <select
+                                                value={selectedStatus}
+                                                onChange={(e) => setSelectedStatus(e.target.value as ReportFilter)}
+                                                className="border px-3 py-2 rounded-lg text-sm"
+                                            >
+                                                <option value="UNDER_REVIEW">Under Review</option>
+                                                <option value="ACTION_TAKEN">Action Taken</option>
+                                            </select>
+                                            <button
+                                                onClick={async () => {
+                                                    const updated = await resolveReport(report!._id, selectedStatus);
+                                                    if (updated) {
+                                                        onUpdate();
+                                                        onClose();
+                                                    }
+                                                }}
+                                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button className="bg-blue-100 text-blue-600 px-4 py-2 mt-5 rounded-lg hover:bg-blue-200"
+                                            onClick={() => setIsResolveMode(true)}
+                                        >
+                                            Resolve
+                                        </button>
+                                    )}
+                                </>
+                            )}
+
                         </div>
 
                         <div className="flex justify-end flex-wrap gap-2 mt-4">
-                            {mode === "edit" && report?.status === "UNDER_REVIEW" && (
+                            {!isAdmin && mode === "edit" && report?.status === "UNDER_REVIEW" && (
                                 <button className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 disabled:opacity-50" onClick={openDeleteModal} disabled={isDeleting}>
                                     <Trash2 size={16} className="inline mr-1" /> {isDeleting ? "Deleting..." : "Delete"}
                                 </button>
@@ -198,7 +239,7 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                                 </button>
                             )}
 
-                            {mode === "edit" && (
+                            {!isAdmin && mode === "edit" && (
                                 <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200" onClick={toggleEdit}>
                                     <Edit3 size={16} className="inline mr-1" /> {isEditing ? "Cancel Edit" : "Edit"}
                                 </button>

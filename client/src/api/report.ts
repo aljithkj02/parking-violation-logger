@@ -74,3 +74,20 @@ export const deleteReport = async (id: string): Promise<boolean> => {
         return false;
     }
 };
+
+// RESOLVE Report
+export const resolveReport = async (
+    id: string, status: ReportFilter
+): Promise<Report | null> => {
+    try {
+        const res = await api.put(`/report/resolve/${id}`, {
+            status,
+        });
+        toast.success("Report resolved successfully");
+        return res.data;
+    } catch (error: any) {
+        toast.dismiss();
+        toast.error(error?.response?.data?.message || "Failed to resolve report");
+        return null;
+    }
+};
