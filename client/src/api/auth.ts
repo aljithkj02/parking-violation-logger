@@ -22,6 +22,7 @@ export interface AuthResponse {
         name: string;
         email: string;
         role: "ADMIN" | "USER";
+        profileImg?: string;
     };
 }
 

@@ -34,7 +34,13 @@ export class ProfileService {
             return {
                 status: true,
                 message: 'Profile updated successfully',
-                data: updated,
+                data: {
+                    id: updated._id,
+                    name: updated.name,
+                    email: updated.email,
+                    role: updated.role,
+                    profileImg: updated.profileImg
+                },
             };
         } catch (error) {
             console.error('Error updating profile:', error);

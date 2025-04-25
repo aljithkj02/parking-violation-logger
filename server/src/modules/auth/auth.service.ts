@@ -49,6 +49,7 @@ export class AuthService {
                     name: savedUser.name,
                     email: savedUser.email,
                     role: savedUser.role,
+                    profileImg: savedUser.profileImg
                 },
             };
         } catch (error) {
@@ -86,6 +87,7 @@ export class AuthService {
                     name: user.name,
                     email: user.email,
                     role: user.role,
+                    profileImg: user.profileImg
                 },
             };
         } catch (error) {
