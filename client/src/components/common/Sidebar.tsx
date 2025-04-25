@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 interface SidebarProps {
     isOpen: boolean;
@@ -33,7 +33,9 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                     }`}
             >
                 <div className="p-6">
-                    <h2 className="text-2xl font-bold text-indigo-600 mb-6">Logo</h2>
+                    <h2 className="text-2xl font-bold cursor-pointer text-indigo-600 mb-6">
+                        <Link to='/'>Reportify</Link>
+                    </h2>
                     <nav className="space-y-2">
                         {links.map((link) => (
                             <NavLink
