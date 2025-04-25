@@ -33,6 +33,10 @@ export class ReportService {
                     .skip(skip)
                     .limit(limit)
                     .sort({ createdAt: -1 })
+                    .populate(
+                        isAdmin ? 'reportedUserId' : '',
+                        isAdmin ? 'name email profileImg' : ''
+                    )
             ]);
 
             const totalPages = Math.ceil(total / limit);
@@ -143,11 +147,11 @@ export class ReportService {
                 if (existingReport.reportedUserId.toString() !== user.id) {
                     throw new ForbiddenException('You are not authorized to update this report');
                 }
-    
+
                 if (existingReport.status === ReportStatus.ACTION_TAKEN) {
                     throw new BadRequestException("Already taken action for this report!");
                 }
-    
+
             }
 
             await this.reportModel.deleteOne({ _id: reportId });
