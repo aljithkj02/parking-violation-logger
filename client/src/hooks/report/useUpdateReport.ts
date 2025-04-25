@@ -3,7 +3,7 @@ import { updateReport } from "../../api/report";
 import { Report } from "../../utils/report.type";
 
 export const useUpdateReport = () => {
-    const mutate = async (id: string, data: Omit<Report, "_id" | "status" | "createdAt" | "updatedAt">) => {
+    const mutate = async (id: string, data: Omit<Report, "_id" | "status" | "createdAt" | "updatedAt" | "reportedUserId">) => {
         try {
             toast.loading("Updating report...");
             await updateReport(id, data);

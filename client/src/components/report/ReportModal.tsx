@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Maximize2, Trash2, Edit3, Plus, Save } from "lucide-react";
 import moment from "moment";
 import { uploadFiles } from "../../api/upload";
-import { Report, ReportFilter } from "../../utils/report.type";
+import { Report, ReportedUser, ReportFilter } from "../../utils/report.type";
 import { useUpdateReport } from "../../hooks/report/useUpdateReport";
 import { useDeleteReport } from "../../hooks/report/useDeleteReport";
 import { useCreateReport } from "../../hooks/report/useCreateReport";
@@ -31,6 +31,21 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
     const { mutate: updateReport } = useUpdateReport();
     const { mutate: deleteReport, isLoading: isDeleting } = useDeleteReport();
     const { mutate: createReport } = useCreateReport();
+    const modalRef = useRef<HTMLDivElement | null>(null); 
+
+    useEffect(() => {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+                onClose(); 
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutsideClick);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick);
+        };
+    }, [onClose]);
 
     const resetEditState = () => {
         if (report) {
@@ -105,7 +120,7 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
     return createPortal(
         <AnimatePresence>
             <motion.div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <motion.div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}>
+                <motion.div ref={modalRef} className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}>
                     <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-black transition">
                         <X size={24} />
                     </button>
@@ -189,6 +204,24 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                                 </>
                             )}
 
+                            {isAdmin && report && report.reportedUserId && (
+                                <div className="bg-gray-100 p-4 rounded-lg mt-4">
+                                    <h3 className="text-lg font-semibold">Reported User Info</h3>
+                                    <div className="flex items-center gap-4 mt-2">
+                                        <img
+                                            src={(report.reportedUserId as ReportedUser).profileImg || '/path/to/default-profile.png'}
+                                            alt={(report.reportedUserId as ReportedUser).name}
+                                            className="w-16 h-16 object-cover rounded-full"
+                                        />
+                                        <div>
+                                            <p className="text-lg font-medium">{(report.reportedUserId as ReportedUser).name}</p>
+                                            <p className="text-sm text-gray-600">{(report.reportedUserId as ReportedUser).email}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+
                             {isAdmin && mode === "edit" && (
                                 <>
                                     {isResolveMode ? (
@@ -239,7 +272,7 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                                 </button>
                             )}
 
-                            {!isAdmin && mode === "edit" && (
+                            {!isAdmin && mode === "edit" && report?.status === "UNDER_REVIEW" && (
                                 <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200" onClick={toggleEdit}>
                                     <Edit3 size={16} className="inline mr-1" /> {isEditing ? "Cancel Edit" : "Edit"}
                                 </button>

@@ -1,5 +1,11 @@
 export type ReportFilter = "UNDER_REVIEW" | "ACTION_TAKEN";
 
+export interface ReportedUser {
+    email: string;
+    name: string;
+    profileImg?: string;
+    _id: string
+}
 export interface Report {
     _id: string;
     text: string;
@@ -8,6 +14,7 @@ export interface Report {
     status: ReportFilter;
     createdAt: string;
     updatedAt: string;
+    reportedUserId: string | ReportedUser;
 }
 
 export interface ReportResponse {

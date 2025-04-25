@@ -9,7 +9,7 @@ import { Loader } from "../components/common/Loader";
 
 export const Reports = () => {
     const [page, setPage] = useState(1);
-    const [limit] = useState(5);
+    const [limit] = useState(10);
     const [filter, setFilter] = useState<ReportFilter | 'all'>('all');
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
@@ -30,6 +30,7 @@ export const Reports = () => {
     const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const newFilter = event.target.value as ReportFilter;
         setFilter(newFilter);
+        setPage(1);
     };
 
     return (
