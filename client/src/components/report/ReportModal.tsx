@@ -267,7 +267,7 @@ export const ReportModal = ({ report, mode, onClose, onUpdate }: Props) => {
                             )}
 
                             {isEditing && (
-                                <button className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200" onClick={handleSubmit}>
+                                <button className="cursor-pointer bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200" onClick={handleSubmit}>
                                     <Save size={16} className="inline mr-1" /> {mode === "create" ? "Create Report" : "Save Changes"}
                                 </button>
                             )}
