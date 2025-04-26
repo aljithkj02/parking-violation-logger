@@ -9,6 +9,7 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { UploadModule } from './upload/upload.module';
 import { ProfileModule } from './profile/profile.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
     imports: [
@@ -21,7 +22,8 @@ import { ProfileModule } from './profile/profile.module';
         AuthModule,
         ReportModule,
         UploadModule,
-        ProfileModule
+        ProfileModule,
+        DashboardModule
     ],
     controllers: [],
     providers: [JwtStrategy, JwtService],
