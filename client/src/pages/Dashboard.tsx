@@ -104,6 +104,7 @@ export const Dashboard = () => {
                             fill="#3B82F6"
                             label
                         >
+                            {/* @ts-ignore */}
                             {pieData.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#3B82F6' : '#4ADE80'} />
                             ))}

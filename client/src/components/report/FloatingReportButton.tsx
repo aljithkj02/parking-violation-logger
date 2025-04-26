@@ -24,7 +24,7 @@ export const FloatingReportButton = () => {
             {/* Report Modal */}
             {isModalOpen && (
                 <ReportModal
-                    report={{ text: "", location: "", assets: [], status: "UNDER_REVIEW", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), _id: "" }}
+                    report={{ text: "", location: "", assets: [], status: "UNDER_REVIEW", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), _id: "", reportedUserId: "" }}
                     onClose={handleCloseModal}
                     onUpdate={() => dispatch(refetchData())}
                     mode="create"
